@@ -1,14 +1,24 @@
 import React from "react";
 import axios from "axios";
+import { withRouter } from "react-router-dom";
 
 import requiresAuth from "../auth/requiresAuth.js";
 
 class JokeList extends React.Component {
   state = {
-    jokes: []
+    jokes: [],
+    isFetching: true,
+    error: ""
   };
 
   render() {
+    if (this.state.isFetching) {
+      return (
+        <div>
+          <h1>Loading Dad Jokes</h1>
+        </div>
+      );
+    }
     return (
       <div>
         <h1>Dad Jokes!</h1>
@@ -27,12 +37,16 @@ class JokeList extends React.Component {
     axios
       .get(endpoint)
       .then(res => {
-        this.setState(() => ({ jokes: res.data }));
+        this.setState(() => ({
+          jokes: res.data,
+          error: "",
+          isFetching: false
+        }));
       })
       .catch(({ response }) => {
-        console.error(response);
+        this.setState(() => ({ error: response, isFetching: false }));
       });
   }
 }
 
-export default requiresAuth(JokeList);
+export default withRouter(requiresAuth(JokeList));
