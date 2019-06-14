@@ -1,11 +1,17 @@
 import React from "react";
-import "./App.css";
+import { Route } from "react-router-dom";
+
+import Navigation from "./components/Navigation.js";
+import JokeList from "./components/JokeList.js";
+import Login from "./components/Login.js";
 
 function App() {
   return (
-    <div>
-      <h1>Hello</h1>
-    </div>
+    <>
+      <Navigation />
+      <Route exact path="/" component={JokeList} />
+      <Route path="/login" component={Login} />
+    </>
   );
 }
 

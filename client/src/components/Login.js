@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 
 export default class Login extends React.Component {
   state = {
@@ -9,14 +10,24 @@ export default class Login extends React.Component {
   render() {
     return (
       <div>
-        <form action="">
+        <form onSubmit={this.handleSubmit}>
           <div>
             <label htmlFor="username">Username</label>
-            <input id="username" type="text" />
+            <input
+              value={this.state.username}
+              onChange={this.handleChange}
+              id="username"
+              type="text"
+            />
           </div>
           <div>
             <label htmlFor="password">Password</label>
-            <input id="password" type="password" />
+            <input
+              value={this.state.password}
+              onChange={this.handleChange}
+              id="password"
+              type="password"
+            />
           </div>
           <button>Login</button>
         </form>
@@ -24,7 +35,22 @@ export default class Login extends React.Component {
     );
   }
 
+  handleChange = event => {
+    const { id, value } = event.target;
+    this.setState({
+      [id]: value
+    });
+  };
+
   handleSubmit = event => {
     event.preventDefault();
+    const endpoint = "http://localhost:3300/api/login";
+    axios
+      .post(endpoint, this.state)
+      .then(res => {
+        localStorage.setItem("token", res.data.token);
+        this.props.history.push("/");
+      })
+      .catch(err => console.error(err));
   };
 }
