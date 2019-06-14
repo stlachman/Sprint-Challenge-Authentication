@@ -2,7 +2,7 @@ const axios = require("axios");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const { authenticate } = require("../auth/authenticate");
+const { authenticate, jwtKey } = require("../auth/authenticate");
 const Users = require("./user-model.js");
 
 module.exports = server => {
@@ -18,7 +18,8 @@ function register(req, res) {
 
   Users.add(user)
     .then(savedUser => {
-      res.status(201).json(savedUser);
+      const token = generateToken(user);
+      res.status(201).json({ savedUser, token });
     })
     .catch(error => {
       res.status(500).json(error);
@@ -30,7 +31,6 @@ function login(req, res) {
   Users.findUser({ username })
     .first()
     .then(user => {
-      console.log(user);
       if (user && bcrypt.compareSync(password, user.password)) {
         const token = generateToken(user);
 
@@ -64,13 +64,13 @@ function getJokes(req, res) {
 
 function generateToken(user) {
   const payload = {
-    subject: user.id, // standard claim = sub
-    username: user.username // additional data
+    subject: user.id,
+    username: user.username
   };
 
   const options = {
     expiresIn: "8h"
   };
 
-  return jwt.sign(payload, secrets.jwtSecret, options);
+  return jwt.sign(payload, jwtKey, options);
 }
